@@ -14,7 +14,7 @@ end
 # Overrides Date#to_s with pretty calendar
 #
 class PrettyCalendar < Date
-  VERSION = '0.1.0'.freeze
+  VERSION = '0.2.0'.freeze
 
   def pretty_format
     result = [cal_head,
@@ -68,7 +68,7 @@ class PrettyCalendar < Date
 end
 
 OptionParser.new do |opts|
-  opts.banner = 'Usage: cal [options]'
+  opts.banner = 'Usage: cal [options] [dd.mm.yyyy]'
 
   opts.on('-v', '--version', 'Prints version') do
     puts "cal v#{PrettyCalendar::VERSION}"
@@ -81,4 +81,8 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-puts PrettyCalendar.today
+if ARGV.empty?
+  puts PrettyCalendar.today
+else
+  puts PrettyCalendar.parse(ARGV.first)
+end
