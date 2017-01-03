@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'date'
+require 'optparse'
 
 # monkey-patching
 class String
@@ -13,6 +14,8 @@ end
 # Overrides Date#to_s with pretty calendar
 #
 class PrettyCalendar < Date
+  VERSION = '0.1.0'.freeze
+
   def pretty_format
     result = [cal_head,
               cal_days]
@@ -63,5 +66,19 @@ class PrettyCalendar < Date
     day.wday.zero? ? 6 : (day.wday - 1)
   end
 end
+
+OptionParser.new do |opts|
+  opts.banner = 'Usage: cal [options]'
+
+  opts.on('-v', '--version', 'Prints version') do
+    puts "cal v#{PrettyCalendar::VERSION}"
+    exit
+  end
+
+  opts.on('-h', '--help', 'Prints this help') do
+    puts opts
+    exit
+  end
+end.parse!
 
 puts PrettyCalendar.today
