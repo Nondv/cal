@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+
+require 'date'
+
+# monkey-patching
+class String
+  def highlight
+    "\e[7m#{self}\e[0m"
+  end
+end
+
+#
+# Overrides Date#to_s with pretty calendar
+#
+class PrettyCalendar < Date
+  def pretty_format
+    result = [cal_head,
+              cal_days]
+
+    result.join("\n")
+  end
+
+  alias to_s pretty_format
+
+  private
+
+  def cal_head
+    "#{cal_month_year.center(cal_wday_names.length)}\n#{cal_wday_names}"
+  end
+
+  def cal_wday_names
+    'Mo Tu We Th Fr Sa Su'
+  end
+
+  def cal_month_year
+    strftime('%b %Y')
+  end
+
+  def cal_days
+    first_line_offset = ' ' * (days_from_monday(month_days.first) * 3)
+
+    month_days.reduce(first_line_offset) do |result, day|
+      number = day.strftime('%e')
+      number = number.highlight if day == self
+
+      result + number + (day.sunday? ? "\n" : ' ')
+    end
+  end
+
+  def month_days(m = month)
+    date = self - (day - 1) # first day of month
+
+    result = []
+    while date.month == m
+      result << date
+      date += 1
+    end
+
+    result
+  end
+
+  def days_from_monday(day)
+    day.wday.zero? ? 6 : (day.wday - 1)
+  end
+end
+
+puts PrettyCalendar.today
